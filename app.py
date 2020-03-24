@@ -53,6 +53,26 @@ def get_todos():
 
     return jsonify(result)
 
+@app.route("/paragraph/<id>", methods=["PATCH"])
+def update_paragraph(id):
+    paragraph = Paragraph.query.get(id)
+
+    new_paragraph = request.json["content"]
+
+    paragraph.content = new_paragraph
+    
+    db.session.commit()
+    return paragraph_schema.jsonify(paragraph)
+
+@app.route("/paragraph/<id>", methods=["DELETE"])
+def delete_paragraph(id):
+    paragraph = Paragraph.query.get(id)
+    db.session.delete(paragraph)
+    db.session.commit()
+
+    return jsonify("Paragraph Deleted")
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
