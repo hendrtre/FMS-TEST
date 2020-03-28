@@ -3,10 +3,12 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_heroku import Heroku 
 from flask_cors import CORS
+from flask_bcrypt import Bcrypt
 import os 
 
 
 app = Flask(__name__)
+bcrypt = Bcrypt(app)
 CORS(app) 
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -16,6 +18,25 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "ap
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
+
+class User(db.Model):
+    __tablename__ = "users"
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(50), unique=True)
+    password = db.Column(db.String(20))
+
+    def __init__(self, email, password):
+        self.email = email
+        self.password = password
+
+class UserSchema(ma.Schema):
+    class Meta:
+        fields = ("id", "email", "password")
+
+user_schema = UserSchema()
+users_schema = UserSchema(many=True)
+
+
 
 class Paragraph(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -33,7 +54,7 @@ paragraphs_schema = ParagraphSchema(many=True)
 
 @app.route('/')
 def hello():
-    return "sup trent"
+    return "Waz'up Trent"
 
 @app.route('/paragraph', methods=["POST"])
 def add_paragraph():
@@ -73,6 +94,46 @@ def delete_paragraph(id):
     db.session.commit()
 
     return jsonify("Paragraph Deleted")
+
+### REGISTER ##########################################
+@app.route('/api/v1/register', methods = ['POST'])
+def register_User():
+    email = request.json.get('email')
+    password = request.json.get('password')
+    hashed_password = bcrypt.generate_password_hash(password)
+
+    new_user = User(email, hashed_password)
+
+    db.session.add(new_user)
+    db.session.commit() 
+
+    return jsonify("User Created")
+
+@app.route('/api/v1/registers', methods = ['GET'])
+def get_User():
+    all_Users = User.query.all()
+    result = users_schema.dump(all_Users)
+
+    return jsonify(result)
+########################################################
+
+
+### LOGIN ##############################################
+@app.route('/api/v1/login', methods = ['POST'])
+def login_User():
+    email = request.json.get('email')
+    password = request.json.get('password')
+
+    user = User.query.filter_by(email=email).first()
+    if user:
+        if bcrypt.check_password_hash(user.password, password):
+            return "Password Authenticated"
+        else:
+            return "Password Invalid"
+    else:
+        return "No user found, try agian"
+    print(user)
+######################################################
 
 
 
