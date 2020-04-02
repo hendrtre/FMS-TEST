@@ -8,13 +8,14 @@ import os
 
 
 app = Flask(__name__)
+heroku = Heroku(app)
 bcrypt = Bcrypt(app)
 CORS(app) 
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "app.sqlite")
+# basedir = os.path.abspath(os.path.dirname(__file__))
+# app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "app.sqlite")
 
-# app.config["SQLALCHEMY_DATABASE_URI"] ="postgres://aunziahgdjhvxj:df663cd94562dcc8cc1b6dcba33c8e890fcf4ee26f1f57f8d568d231a0d555b4@ec2-54-152-175-141.compute-1.amazonaws.com:5432/d65kpqisr3n7fb"
+app.config["SQLALCHEMY_DATABASE_URI"] ="postgres://aunziahgdjhvxj:df663cd94562dcc8cc1b6dcba33c8e890fcf4ee26f1f57f8d568d231a0d555b4@ec2-54-152-175-141.compute-1.amazonaws.com:5432/d65kpqisr3n7fb"
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
