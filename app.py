@@ -23,8 +23,8 @@ ma = Marshmallow(app)
 class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(50), unique=True)
-    password = db.Column(db.String(20))
+    email = db.Column(db.String(100), unique=True)
+    password = db.Column(db.String(200))
 
     def __init__(self, email, password):
         self.email = email
@@ -81,7 +81,7 @@ def get_todos():
 def update_paragraph(id):
     paragraph = Paragraph.query.get(id)
 
-    new_paragraph = request.json["content"]
+    new_paragraph = request.json['content']
 
     paragraph.content = new_paragraph
     
