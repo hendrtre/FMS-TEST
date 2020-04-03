@@ -101,7 +101,7 @@ def delete_paragraph(id):
 def register_User():
     email = request.json.get('email')
     password = request.json.get('password')
-    hashed_password = bcrypt.generate_password_hash(password)
+    hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
 
     new_user = User(email, hashed_password)
 
