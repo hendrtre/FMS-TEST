@@ -24,7 +24,7 @@ class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True)
-    password = db.Column(db.String(200))
+    password = db.Column(db.String())
 
     def __init__(self, email, password):
         self.email = email
@@ -127,7 +127,8 @@ def login_User():
 
     user = User.query.filter_by(email=email).first()
     if user:
-        if bcrypt.check_password_hash(user.password, password):
+        user_hashed_password = user.password
+        if bcrypt.check_password_hash(user_hashed_password, password):
             return "Password Authenticated"
         else:
             return "Password Invalid"
